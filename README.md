@@ -1,2 +1,2 @@
 # tidyss
-A collection of tools for making your sample sheets better
+A collection of tools for making sample sheets better
