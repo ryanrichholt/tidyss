@@ -2,7 +2,7 @@ import os
 import sys
 import re
 import gzip
-import yaml
+from ruamel import yaml
 import json
 import argparse
 
@@ -17,18 +17,18 @@ class IlluminaFastqFilename:
     match = pattern.match
 
 
-class IlluminaSeqidV1:
+class IlluminaSeqIdV1:
     pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)(?P<index_number>#\d|[NACTG]*)\/(?P<read>\d)")
     match = pattern.match
 
 
-class IlluminaSeqidV2:
+class IlluminaSeqIdV2:
     pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<run_number>\d*):(?P<flowcellID>[a-zA-Z0-9]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)\s(?P<read>\d*):(?P<is_filtered>[YN]):(?P<control_number>\d*):(?P<index_sequence>[NACTG]*)")
     match = pattern.match
 
 
 filename_patterns = (IlluminaFastqFilename, FastqFilename)
-seqid_patterns = (IlluminaSeqidV2, IlluminaSeqidV1)
+seqid_patterns = (IlluminaSeqIdV2, IlluminaSeqIdV1)
 
 
 class Fastq:
@@ -52,8 +52,8 @@ class Fastq:
                 self.name = gd['name']
                 self.lane = gd.get('lane')
                 self.read = gd.get('read')
-                self.read = int(self.read.strip('R'))
-                self.barcode = gd.get('barcode')
+                if self.read is not None:
+                    self.read = int(self.read.strip('R'))
                 break
 
         # Read the first seqid
@@ -75,16 +75,12 @@ class Fastq:
                 self.instrument = gd.get('instrument')
                 self.run_number = gd.get('run_number')
                 self.fcid = gd.get('flowcellID', 'Unknown')
-                self.is_filtered = gd.get('is_filtered')
-                self.control_number = gd.get('control_number')
-                # Overwrite these items, more reliable than filename
+                # Overwrite lane if it's present
                 self.lane = gd.get('lane') or self.lane
-                self.read = gd.get('read') or self.read
-                self.barcode = gd.get('barcode') or self.barcode
                 break
 
         # Beginnings of a read group tag for this fastq
-        self.readgroup = "{}{}".format(self.fcid, self.lane)
+        self.readgroup = "{}.{}".format(self.fcid, self.lane)
 
     def __str__(self):
         return yaml.dump(self.__dict__, default_flow_style=False)
