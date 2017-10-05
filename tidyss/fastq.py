@@ -53,7 +53,7 @@ class Fastq:
                 self.lane = gd.get('lane')
                 self.read = gd.get('read')
                 if self.read is not None:
-                    self.read = int(self.read.strip('R'))
+                    self.read = self.read.strip('R')
                 break
 
         # Read the first seqid
@@ -75,8 +75,12 @@ class Fastq:
                 self.instrument = gd.get('instrument')
                 self.run_number = gd.get('run_number')
                 self.fcid = gd.get('flowcellID', 'Unknown')
-                # Overwrite lane if it's present
+                self.is_filtered = gd.get('is_filtered')
+                self.control_number = gd.get('control_number')
+                # Overwrite these items, more reliable than filename
                 self.lane = gd.get('lane') or self.lane
+                self.read = gd.get('read') or self.read
+                self.barcode = gd.get('barcode') or self.barcode
                 break
 
         # Beginnings of a read group tag for this fastq
