@@ -2,9 +2,9 @@ import os
 import sys
 import re
 import gzip
-from ruamel import yaml
-import json
 import argparse
+import json
+from ruamel import yaml
 
 
 class FastqFilename:
@@ -38,6 +38,20 @@ class Fastq:
         the first line of the FASTQ.
         :param path: Path to a FASTQ file.
         """
+        self.seqid_pattern = None
+        self.instrument = None
+        self.run_number = None
+        self.fcid = None
+        self.is_filtered = None
+        self.control_number = None
+        self.lane = None
+        self.read = None
+        self.barcode = None
+        self.filename_pattern = None
+        self.name = None
+        self.lane = None
+        self.read = None
+
         self.path = path
         self.filename = os.path.basename(self.path)
         if not FastqFilename.match(self.filename):
@@ -92,6 +106,11 @@ class Fastq:
 
     def length(self, openfn=None, mode=None):
         """ Get the total number of reads"""
+        # TODO this can be approximated by
+        # sampling random data
+        # count line length
+        # total bytes/ average line length
+        # etc..
         if openfn is None or mode is None:
             if self.gzipped:
                 openfn = gzip.open
