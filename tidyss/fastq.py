@@ -2,7 +2,7 @@ import os
 import sys
 import re
 import gzip
-import yaml
+from ruamel import yaml
 import json
 import argparse
 
@@ -17,18 +17,18 @@ class IlluminaFastqFilename:
     match = pattern.match
 
 
-class IlluminaSeqidV1:
+class IlluminaSeqIdV1:
     pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)(?P<index_number>#\d|[NACTG]*)\/(?P<read>\d)")
     match = pattern.match
 
 
-class IlluminaSeqidV2:
+class IlluminaSeqIdV2:
     pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<run_number>\d*):(?P<flowcellID>[a-zA-Z0-9]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)\s(?P<read>\d*):(?P<is_filtered>[YN]):(?P<control_number>\d*):(?P<index_sequence>[NACTG]*)")
     match = pattern.match
 
 
 filename_patterns = (IlluminaFastqFilename, FastqFilename)
-seqid_patterns = (IlluminaSeqidV2, IlluminaSeqidV1)
+seqid_patterns = (IlluminaSeqIdV2, IlluminaSeqIdV1)
 
 
 class Fastq:
@@ -52,7 +52,8 @@ class Fastq:
                 self.name = gd['name']
                 self.lane = gd.get('lane')
                 self.read = gd.get('read')
-                self.read = int(self.read.strip('R'))
+                if self.read is not None:
+                    self.read = int(self.read.strip('R'))
                 break
 
         # Read the first seqid
@@ -79,7 +80,7 @@ class Fastq:
                 break
 
         # Beginnings of a read group tag for this fastq
-        self.readgroup = "{}{}".format(self.fcid, self.lane)
+        self.readgroup = "{}.{}".format(self.fcid, self.lane)
 
     def __str__(self):
         return yaml.dump(self.__dict__, default_flow_style=False)
