@@ -168,18 +168,18 @@ def build_samples(fastqs):
     for fastq in fastqs:
         if fastq.name not in samples:
             samples[fastq.name] = {'name': fastq.name}
+
         if 'name' not in samples[fastq.name]:
             samples[fastq.name]['name'] = fastq.name
+
         if 'readgroups' not in samples[fastq.name]:
             samples[fastq.name]['readgroups'] = {}
+
         if fastq.readgroup not in samples[fastq.name]['readgroups']:
-            samples[fastq.name]['readgroups'][fastq.readgroup] = [None]
-        while len(samples[fastq.name]['readgroups'][fastq.readgroup]) < fastq.read:
-            samples[fastq.name]['readgroups'][fastq.readgroup].append(None)
-        # Making an assumption here that no fastq will ever be labeled R0
-        # This is probably a bad assumption, but I will need to write a container
-        # for the reads that can be 0 or 1 base indexed depending on what is added?
-        samples[fastq.name]['readgroups'][fastq.readgroup][fastq.read - 1] = fastq.path
+            samples[fastq.name]['readgroups'][fastq.readgroup] = {}
+
+        samples[fastq.name]['readgroups'][fastq.readgroup][fastq.read] = fastq.path
+
     return samples
 
 
