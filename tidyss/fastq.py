@@ -18,12 +18,12 @@ class IlluminaFastqFilename:
 
 
 class IlluminaSeqIdV1:
-    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)(?P<index_number>#\d|[NACTG]*)\/(?P<read>\d)")
+    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)(?P<barcode>#\d|[NACTG]*)\/(?P<read>\d)")
     match = pattern.match
 
 
 class IlluminaSeqIdV2:
-    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<run_number>\d*):(?P<flowcellID>[a-zA-Z0-9]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)\s(?P<read>\d*):(?P<is_filtered>[YN]):(?P<control_number>\d*):(?P<index_sequence>[NACTG]*)")
+    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<run_number>\d*):(?P<flowcellID>[a-zA-Z0-9]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)\s(?P<read>\d*):(?P<is_filtered>[YN]):(?P<control_number>\d*):(?P<barcode>[NACTG]*)")
     match = pattern.match
 
 
@@ -52,6 +52,7 @@ class Fastq:
                 self.name = gd['name']
                 self.lane = gd.get('lane')
                 self.read = gd.get('read')
+                self.barcode = gd.get('barcode')
                 if self.read is not None:
                     self.read = self.read.strip('R')
                 break
