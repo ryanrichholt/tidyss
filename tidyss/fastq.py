@@ -50,9 +50,10 @@ class Fastq:
                 gd = groups.groupdict()
                 self.filename_pattern = pattern.__name__
                 self.name = gd['name']
-                self.lane = gd.get('lane') or '1'
-                self.read = gd.get('read') or '1'
+                self.lane = gd.get('lane')
+                self.read = gd.get('read')
                 self.read = int(self.read.strip('R'))
+                break
 
         # Read the first seqid
         if self.path.endswith('gz'):
@@ -72,11 +73,11 @@ class Fastq:
                 self.seqid_pattern = pattern.__name__
                 self.instrument = gd.get('instrument')
                 self.run_number = gd.get('run_number')
-                self.fcid = gd.get('flowcellID')
+                self.fcid = gd.get('flowcellID', 'Unknown')
+                # Overwrite lane if it's present
                 self.lane = gd.get('lane') or self.lane
-        else:
-            self.seqid_pattern = None
-            self.fcid = 'Unknown'
+                break
+
         # Beginnings of a read group tag for this fastq
         self.readgroup = "{}{}".format(self.fcid, self.lane)
 
