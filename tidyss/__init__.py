@@ -1,1 +1,1 @@
-import tidyss.fastqs
+import tidyss.fastq

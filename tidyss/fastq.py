@@ -13,17 +13,17 @@ class FastqFilename:
 
 
 class IlluminaFastqFilename:
-    pattern = re.compile(r"(?P<name>.+?)_?(?P<barcode>[ACTG]{3,30})?_?(?P<lane>L\d{3})?(_)?(?P<read>R\d)?_?(?P<set>\d{3})(?P<extension>\.fastq|\.fastq\.gz)$")
+    pattern = re.compile(r"(?P<name>.+?)_?(?P<barcode>[NACTG]{3,30})?_?(?P<lane>L\d{3})?(_)?(?P<read>R\d)?_?(?P<set>\d{3})(?P<extension>\.fastq|\.fastq\.gz)$")
     match = pattern.match
 
 
 class IlluminaSeqidV1:
-    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)(?P<index_number>#\d|[ACTGN]*)\/(?P<read>\d)")
+    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)(?P<index_number>#\d|[NACTG]*)\/(?P<read>\d)")
     match = pattern.match
 
 
 class IlluminaSeqidV2:
-    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<run_number>\d*):(?P<flowcellID>[a-zA-Z0-9]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)\s(?P<read>\d*):(?P<is_filtered>[YN]):(?P<control_number>\d*):(?P<index_sequence>[ACTG]*)")
+    pattern = re.compile(r"@(?P<instrument>[a-zA-Z0-9_-]*):(?P<run_number>\d*):(?P<flowcellID>[a-zA-Z0-9]*):(?P<lane>\d*):(?P<tile>\d*):(?P<x_pos>\d*):(?P<y_pos>\d*)\s(?P<read>\d*):(?P<is_filtered>[YN]):(?P<control_number>\d*):(?P<index_sequence>[NACTG]*)")
     match = pattern.match
 
 
@@ -164,7 +164,9 @@ def print_samplesheet(samplesheet, fp, format='json'):
         serializer = as_yaml
     else:
         raise ValueError('Cant print samplesheets with "%s"' % format)
-    print(serializer(samplesheet), file=fp)
+    fp.write(serializer(samplesheet))
+    fp.flush()
+    fp.close()
 
 
 def load_samplesheet(path, format='json'):
@@ -231,14 +233,15 @@ def discover(args=None):
 
     # Log a summary of what we found
     if not args.quiet:
-        print('Filename\tSequenceID\tPath', file=sys.stderr)
+        sys.stderr.write('Filename\tSequenceID\tPath\n')
         for fastq in fastqs:
-            msg = '{filename}\t{seqid}\t{path}'.format(
+            msg = '{filename}\t{seqid}\t{path}\n'.format(
                 filename=fastq.filename_pattern,
                 seqid=fastq.seqid_pattern,
                 path=fastq.path
             )
-            print(msg, file=sys.stderr)
+            sys.stderr.write(msg)
+        sys.stderr.flush()
 
     # Print a samplesheet if we want to
     if args.out is not None:

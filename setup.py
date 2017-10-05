@@ -7,11 +7,11 @@ setup(
     author='Ryan Richholt',
     author_email='rrichholt@tgen.org',
     url='https://github.com/ryanrichholt/tidyss',
-    python_requires=">=3.0",
+    #python_requires=">=3.0",
     packages=['tidyss'],
     entry_points={
         'console_scripts': [
-            'tidyss = tidyss.fastqs:main'
+            'tidyss-fastq = tidyss.fastq:main'
         ]
     },
     install_requires=[
